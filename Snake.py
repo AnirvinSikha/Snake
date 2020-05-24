@@ -13,7 +13,9 @@ wn.tracer(0)
 width, height = turtle.window_width(), turtle.window_height()
 minX, maxX = -width/2, width/2
 minY, maxY = -height/2, height/2
-
+xPoints = set()
+yPoints = set()
+score = 0
 
 #Set up snake
 snake = turtle.Turtle()
@@ -30,15 +32,16 @@ food.shape("square")
 food.color("red")
 food.penup()
 
-
 #food spawn function, spawns in a random place in the map.
 def spawn_food():
     food_x = random.randint(minX, maxX)
     food_y = random.randint(minY, maxY)
-    while(food_x != snake.xcor() and food_y != snake.ycor()):
+    while(food_x  in xPoints and food_y in yPoints):
         food_x = random.randint(minX, maxX)
         food_y = random.randint(minY, maxY)
     food.goto(food_x, food_y)
+    xPoints.clear()
+    yPoints.clear()
 
 spawn_food()
 #Set up body, add body parts when eating a food
@@ -86,6 +89,7 @@ while True:
     #eating the food
     if(snake.distance(food) < 20):
         spawn_food()
+        score += 1
         seg = turtle.Turtle()
         seg.penup()
         x = snake.xcor()
@@ -104,6 +108,8 @@ while True:
             x = prev.xcor()
             y = prev.ycor()
             curr.goto(x, y)
+            xPoints.add(x)
+            yPoints.add(y)
         else:
             move()
 
@@ -112,7 +118,7 @@ while True:
         end_text = turtle.Turtle()
         end_text.goto(0,0)
         end_text.color("white")
-        end_text.write("You hit the wall!", font=("Arial", 24, 'normal'))
+        end_text.write("You hit the wall! Score = " + str(score), font=("Arial", 24, 'normal'))
         break
 
     #body colission loss condition
@@ -126,8 +132,7 @@ while True:
         end_text = turtle.Turtle()
         end_text.goto(0, 0)
         end_text.color("white")
-        end_text.write("You hit yourself!", font=("Arial", 24, 'normal'))
+        end_text.write("You hit yourself! Score = " + str(score), font=("Arial", 24, 'normal'))
         break
-
 
 wn.mainloop()
