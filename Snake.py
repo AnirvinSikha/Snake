@@ -43,17 +43,22 @@ def spawn_food():
 spawn_food()
 #Set up body, add body parts when eating a food
 body = []
+body.append(snake)
 
 #direction moves, then bind these functions to the actual keys
 # then apply the position changes from the moves
 def up():
-    snake.direction = "up"
+    if snake.direction is not "down":
+        snake.direction = "up"
 def down():
-    snake.direction = "down"
+    if snake.direction is not "up":
+        snake.direction = "down"
 def left():
-    snake.direction = "left"
+    if snake.direction is not "right":
+        snake.direction = "left"
 def right():
-    snake.direction = "right"
+    if snake.direction is not "left":
+        snake.direction = "right"
 
 def move():
     x = snake.xcor()
@@ -70,13 +75,15 @@ def move():
 
 while True:
     wn.update()
-    move()
+    #move()
     time.sleep(.02)
     wn.listen()
     wn.onkeypress(up, "Up")
     wn.onkeypress(down, "Down")
     wn.onkeypress(right, "Right")
     wn.onkeypress(left, "Left")
+
+    #eating the food
     if(snake.distance(food) < 20):
         spawn_food()
         seg = turtle.Turtle()
@@ -88,18 +95,17 @@ while True:
         seg.color("white")
         body.append(seg)
 
-    for seg in body:
-        x = seg.xcor()
-        y = seg.ycor()
-        factor = 10
-        if snake.direction == "up":
-            seg.sety(y + factor)
-        elif snake.direction == "down":
-            seg.sety(y - factor)
-        elif snake.direction == "left":
-            seg.setx(x - factor)
-        elif snake.direction == "right":
-            seg.setx(x + factor)
+    #Moving the entire snake along
+    store = None
+    for i in range(len(body) - 1, -1, -1):
+        curr = body[i]
+        if (i is not 0):
+            prev = body[i - 1]
+            x = prev.xcor()
+            y = prev.ycor()
+            curr.goto(x, y)
+        else:
+            move()
 
     #Wall loss condition
     if not minX <= snake.xcor() <= maxX or not minY <= snake.ycor() <= maxY:
@@ -109,7 +115,19 @@ while True:
         end_text.write("You hit the wall!", font=("Arial", 24, 'normal'))
         break
 
-
+    #body colission loss condition
+    head = body[0]
+    loss = False
+    for seg in body[1:]:
+        if head.distance(seg) < 2:
+            loss = True
+            break
+    if loss is True:
+        end_text = turtle.Turtle()
+        end_text.goto(0, 0)
+        end_text.color("white")
+        end_text.write("You hit yourself!", font=("Arial", 24, 'normal'))
+        break
 
 
 wn.mainloop()
